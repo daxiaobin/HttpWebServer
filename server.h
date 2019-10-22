@@ -32,6 +32,7 @@ public:
 
 	void start();
 	void setThreadNum(int threadNum);
+	EventLoop* getEventLoop() const { return loop_; }
 
 	void setConnectionCallback(const ConnectionCallback &cb)
 	{ connectionCallback_ = cb; }

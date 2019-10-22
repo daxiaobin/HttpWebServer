@@ -1,8 +1,11 @@
  /// @file    test.cc
  // @author  daxiaobing(248918860@qq.com)
  /// @date    2019-09-16 19:13:16
- 
+
+#include "httpserver.h"
 #include "eventloop.h"
+ 
+/*#include "eventloop.h"
 #include "channel.h"
 #include "acceptor.h"
 #include "buffer.h"
@@ -100,4 +103,14 @@ int main()
 	EchoServer server(&loop, 9981, idleSeconds);
 	server.start();
 	loop.loop();
+}*/
+
+int main()
+{
+	EventLoop loop;
+	HttpServer httpServer(&loop, 80);
+	httpServer.start();
+	loop.loop();
+
+	return 0;
 }

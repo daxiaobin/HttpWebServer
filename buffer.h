@@ -93,8 +93,14 @@ public:
 		buf.swap(buffer_);
 	}
 
-
 	ssize_t readFd(int fd, int *saveErrno);
+
+	//for parse http request
+	const char* findCRLF() const{
+		const char *data = "\r\n";
+		const char *crlf = std::search(peek(), buffer_.data() + writeIndex_, data, data + 2);
+		return crlf == (buffer_.data() + writeIndex_) ? nullptr : crlf;
+	}
 private:
 	void makeSpace(size_t len){
 		if(writeableBytes() + prependableBytes() < len + kCheapPrepend){
