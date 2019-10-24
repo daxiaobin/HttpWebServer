@@ -1,2 +1,6 @@
 language: c++
+<<<<<<< HEAD
 script: ./WebServer/Makefile
+=======
+script: Makefile
+>>>>>>> b0c896aabb286c7954d487cd9df268ce5b2c4838
