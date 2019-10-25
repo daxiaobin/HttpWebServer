@@ -39,6 +39,7 @@ void HttpResponse::appendToBuffer(Buffer *output) const
 void HttpResponse::setBody(const string &path)
 {
 	assert(path.size() != 0);
+	LOG_INFO <<	path;
 	FILE *fp = fopen(path.c_str(), "r");
 	struct stat statbuf;
 	int ret = stat(path.c_str(), &statbuf);

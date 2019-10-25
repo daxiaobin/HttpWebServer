@@ -51,7 +51,7 @@ void HttpServer::onResponse(const Server::TcpConnectionPtr &conn, HttpRequest &r
 void HttpServer::setResponseContext(HttpRequest &request, HttpResponse &response) //这是HTTP响应到来的请求的逻辑处理函数
 {
 	if(request.getPath() == "/"){
-		string path("/docs/index.html");
+		string path("./docs/index.html");
 		request.setPath(path.data(), path.data() + path.size());
 	}
 	response.setStatusCode(k200OK);
