@@ -4,7 +4,12 @@
  
 #include "httpresponse.h"
 #include "buffer.h"
+#include "base/logging.h"
 #include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 void HttpResponse::appendToBuffer(Buffer *output) const
 {
@@ -29,4 +34,22 @@ void HttpResponse::appendToBuffer(Buffer *output) const
 
 	output->append("\r\n");
 	output->append(body_);
+}
+
+void HttpResponse::setBody(const string &path)
+{
+	assert(path.size() != 0);
+	FILE *fp = fopen(path.c_str(), "r");
+	struct stat statbuf;
+	int ret = stat(path.c_str(), &statbuf);
+	if(ret < 0){
+		LOG_FATAL << "stat error";
+	}
+	char *ptr = new char[statbuf.st_size];
+	size_t n = fread(ptr, 1, statbuf.st_size, fp);
+	if(n != static_cast<size_t>(statbuf.st_size)){
+		LOG_SYSERR << "fread error";
+	}
+	body_.assign(ptr, ptr + statbuf.st_size);
+	delete[] ptr;
 }

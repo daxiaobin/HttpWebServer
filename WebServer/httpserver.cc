@@ -34,7 +34,7 @@ void HttpServer::onMessage(const Server::TcpConnectionPtr &conn, Buffer *buf, Ti
 	}
 }
 
-void HttpServer::onResponse(const Server::TcpConnectionPtr &conn, const HttpRequest &reqe)
+void HttpServer::onResponse(const Server::TcpConnectionPtr &conn, HttpRequest &reqe)
 {
 	const string isShortConnection = reqe.getHeaderFieldValue("Connection");
 	bool close = (isShortConnection == "close" || reqe.getVersion() == kHttp10); //HTTP/1.O不支持长连接。
@@ -48,9 +48,15 @@ void HttpServer::onResponse(const Server::TcpConnectionPtr &conn, const HttpRequ
 	}
 }
 
-void HttpServer::setResponseContext(const HttpRequest &, HttpResponse &response) //这是HTTP响应到来的请求的逻辑处理函数
+void HttpServer::setResponseContext(HttpRequest &request, HttpResponse &response) //这是HTTP响应到来的请求的逻辑处理函数
 {
-	response.setStatusCode(k404NotFound);
-	response.setReasonMessage("Not Found");
-	response.setCloseConnection(true);
+	if(request.getPath() == "/"){
+		string path("/docs/index.html");
+		request.setPath(path.data(), path.data() + path.size());
+	}
+	response.setStatusCode(k200OK);
+	response.setReasonMessage("OK");
+	response.setCloseConnection(false);
+	response.setBody(request.getPath());
+	response.setContentType("html");
 }

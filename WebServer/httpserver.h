@@ -26,9 +26,9 @@ public:
 private:
 	void onConnection(const Server::TcpConnectionPtr &conn);
 	void onMessage(const Server::TcpConnectionPtr &conn, Buffer *buf, Timestamp receiveTime);
-	void onResponse(const Server::TcpConnectionPtr &conn, const HttpRequest &reqe);
+	void onResponse(const Server::TcpConnectionPtr &conn,HttpRequest &reqe);
 
-	static void setResponseContext(const HttpRequest &request, HttpResponse &response);
+	static void setResponseContext(HttpRequest &request, HttpResponse &response);
 private:
 	Server server_;
 };
