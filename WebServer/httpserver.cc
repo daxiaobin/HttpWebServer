@@ -50,7 +50,7 @@ void HttpServer::onResponse(const Server::TcpConnectionPtr &conn, HttpRequest &r
 
 void HttpServer::setResponseContext(HttpRequest &request, HttpResponse &response) //这是HTTP响应到来的请求的逻辑处理函数
 {
-	if(request.getPath() == "/"){
+	/*if(request.getPath() == "/"){
 		string path("./docs/index.html");
 		request.setPath(path.data(), path.data() + path.size());
 	}
@@ -59,4 +59,7 @@ void HttpServer::setResponseContext(HttpRequest &request, HttpResponse &response
 	response.setCloseConnection(false);
 	response.setBody(request.getPath());
 	response.setContentType("html");
+	*/
+	response.setStatusCode(k404NotFound);
+	response.setReasonMessage("Not Found");
 }
