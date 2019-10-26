@@ -19,6 +19,8 @@ void HttpResponse::appendToBuffer(Buffer *output) const
 	output->append(reasonMessage_);
 	output->append("\r\n");
 
+	snprintf(buf, sizeof(buf), "Content-Length: %zd\r\n", body_.size());
+	output->append(buf);
 	if(isShortConnection_){
 		output->append("Connection:close\r\n");
 	}
@@ -36,7 +38,7 @@ void HttpResponse::appendToBuffer(Buffer *output) const
 	output->append(body_);
 }
 
-void HttpResponse::setBody(const string &path)
+/*void HttpResponse::setBody(const string &path)
 {
 	assert(path.size() != 0);
 	LOG_INFO <<	path;
@@ -53,4 +55,4 @@ void HttpResponse::setBody(const string &path)
 	}
 	body_.assign(ptr, ptr + statbuf.st_size);
 	delete[] ptr;
-}
+}*/

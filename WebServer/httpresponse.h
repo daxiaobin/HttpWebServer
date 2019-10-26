@@ -30,10 +30,9 @@ public:
 	void setReasonMessage(const string &message) { reasonMessage_ = message; }
 	void setCloseConnection(bool close) { isShortConnection_ = close; }
 	void setContentType(const string &type) { headerFields_["Content-Type"] = type; }
+	void setBody(const string &str) { body_ = str; }
 	void addHeaderField(const string &key, const string &value) { headerFields_[key] = value; }
 	bool isShortConnection() const { return isShortConnection_; }
-
-	void setBody(const string &path);
 
 	void appendToBuffer(Buffer *buf) const;
 private:

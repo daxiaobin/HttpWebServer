@@ -4,6 +4,7 @@
 
 #include "httpserver.h"
 #include "eventloop.h"
+#include "base/logging.h"
  
 /*#include "eventloop.h"
 #include "channel.h"
@@ -105,10 +106,17 @@ int main()
 	loop.loop();
 }*/
 
-int main()
+int main(int argc, char *argv[])
 {
+	int threadNum = 0;
+	if(argc > 1){
+		threadNum = atoi(argv[1]);
+		Logger::setLogLevel(Logger::WARN);
+	}
+
 	EventLoop loop;
 	HttpServer httpServer(&loop, 80);
+	httpServer.setThreadNum(threadNum);
 	httpServer.start();
 	loop.loop();
 

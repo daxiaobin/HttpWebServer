@@ -45,7 +45,7 @@ int HttpRequest::addHeaderField(const char *start, const char *colon, const char
 		value.resize(value.size() - 1);
 	}
 	headerFields_[key] = value;
-	return kHeaderFieldError;
+	return kExpectHeaderField;
 }
 
 string HttpRequest::getHeaderFieldValue(const string &key) const
@@ -71,7 +71,8 @@ int HttpRequest::parseRequest(Buffer *buf, Timestamp receiveTime)
 				if(colon != crlf){
 					state = addHeaderField(buf->peek(), colon, crlf); //添加头部字段key-value到map中
 					buf->retrieveUntil(crlf + 2);
-					if(state == kHeaderFieldError) return state;
+					if(state == kHeaderFieldError) 
+						return state;
 				}
 				else{ //遇到空行，解析头部完成，保存实体数据
 					buf->retrieveUntil(crlf + 2);

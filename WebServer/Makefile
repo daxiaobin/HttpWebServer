@@ -1,4 +1,4 @@
-CXXFLAGS = -Ibase -pthread -O2 -g
+CXXFLAGS = -Ibase -pthread -O0 -g
 TARGET = test
 SRCS = $(wildcard *.cc base/*.cc) #wildcard：获取匹配模式的文件名
 OBJS = $(patsubst %.cc, %.o, $(SRCS)) #patsubst：模式替换
