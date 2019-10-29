@@ -102,18 +102,18 @@ void Connection::shutdownInLoop()
 {
 	loop_->assertInLoopThread();
 	if(!channel_->isWriting()){
-		shutdownWrite(connfd_);
+		util::shutdownWrite(connfd_);
 	}
 }
 
 void Connection::setTcpNoDelay(bool start)
 {
-	setSocketNoDelay(connfd_, start);
+	util::setSocketNoDelay(connfd_, start);
 }
 
 void Connection::setTcpKeepAlive(bool start)
 {
-	setSocketKeepAlive(connfd_, start);
+	util::setSocketKeepAlive(connfd_, start);
 }
 
 void Connection::handleRead(Timestamp receiveTime)
@@ -158,5 +158,5 @@ void Connection::handleClose()
 
 void Connection::handleError()
 {
-	printf("this error is %d\n", getSockError(connfd_));
+	printf("this error is %d\n", util::getSockError(connfd_));
 }

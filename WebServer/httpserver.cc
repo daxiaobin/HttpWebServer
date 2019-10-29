@@ -47,7 +47,6 @@ void HttpServer::onResponse(const Server::TcpConnectionPtr &conn, const HttpRequ
 	response.appendToBuffer(&buf); //将response对象中的内容写入到buf中
 	conn->send(buf.retrieveAsString());
 	if(response.isShortConnection()){
-		LOG_INFO << "Connection: close";
 		conn->shutdown();
 	}
 }

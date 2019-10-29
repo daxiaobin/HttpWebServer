@@ -11,7 +11,7 @@
 Acceptor::Acceptor(EventLoop *loop, const InetAddress &listenAddr)
 : listenning_(false)
 , loop_(loop)
-, listenFd_(socket_bind_listen(listenAddr))
+, listenFd_(util::socket_bind_listen(listenAddr))
 , channel_(loop_, listenFd_)
 {
 	channel_.setReadCallback(std::bind(&Acceptor::handleRead, this));
@@ -40,7 +40,7 @@ void Acceptor::handleRead()
 	int connfd = accept(listenFd_, (struct sockaddr*)&client_addr, &len);
 	if(connfd >= 0){
 		if(newConnectionCallback_){
-			setSocketNonBlocking(connfd);
+			util::setSocketNonBlocking(connfd);
 			InetAddress peerAddr(client_addr);
 			newConnectionCallback_(connfd, peerAddr);
 		}

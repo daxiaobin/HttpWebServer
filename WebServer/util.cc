@@ -24,7 +24,7 @@ do{\
 	}\
 }while(0)
 
-int socket_bind_listen(const InetAddress &listenAddr)
+int util::socket_bind_listen(const InetAddress &listenAddr)
 {
 	int listenFd = socket(AF_INET, SOCK_STREAM, 0);
 	ErrorCheck(listenFd, -1, "socket");
@@ -44,28 +44,28 @@ int socket_bind_listen(const InetAddress &listenAddr)
 	return listenFd;
 }
 
-void setSocketNonBlocking(int fd)
+void util::setSocketNonBlocking(int fd)
 {
 	int flag = fcntl(fd, F_GETFL, 0);
 	flag |= O_NONBLOCK;
 	fcntl(fd, F_SETFL, flag);
 }
 
-void setSocketNoDelay(int fd, bool start)
+void util::setSocketNoDelay(int fd, bool start)
 {
 	int enable = start ? true : false;
 	int ret = setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (void*)&enable, sizeof(enable));
 	ErrorCheck(ret, -1, "setsockopt");
 }
 
-void setSocketKeepAlive(int fd, bool start)
+void util::setSocketKeepAlive(int fd, bool start)
 {
 	int enable = start ? true : false;
 	int ret = setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void*)&enable, sizeof(enable));
 	ErrorCheck(ret, -1, "setsockopt");
 }
 
-int getSockError(int fd)
+int util::getSockError(int fd)
 {
 	int optval;
 	socklen_t len = sizeof(optval);
@@ -77,12 +77,12 @@ int getSockError(int fd)
 	}
 }
 
-void shutdownWrite(int fd)
+void util::shutdownWrite(int fd)
 {
 	::shutdown(fd, SHUT_WR);
 }
 
-struct sockaddr_in getLocalAddr(int sockfd)
+struct sockaddr_in util::getLocalAddr(int sockfd)
 {
 	struct sockaddr_in localaddr;
 	bzero(&localaddr, sizeof(localaddr));
@@ -93,7 +93,7 @@ struct sockaddr_in getLocalAddr(int sockfd)
 	return localaddr;
 }
 
-struct sockaddr_in getPeerAddr(int sockfd)
+struct sockaddr_in util::getPeerAddr(int sockfd)
 {
 	struct sockaddr_in peerAddr;
 	bzero(&peerAddr, sizeof(peerAddr));

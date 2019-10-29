@@ -49,7 +49,7 @@ void Server::newConnection(int connfd, const InetAddress &clientAddr)
 	std::string connName = name_ + buf;
 
 	LOG_INFO << "newConnection [" << connName << "] " << "from [" << clientAddr.toHostPort() << "]";
-	InetAddress localAddr(getLocalAddr(connfd));
+	InetAddress localAddr(util::getLocalAddr(connfd));
 
 	EventLoop *ioLoop = threadpool_->getNextLoop();
 	TcpConnectionPtr conn(new Connection(ioLoop, connName, connfd, localAddr, clientAddr)); //注意Connection对象的生命周期，

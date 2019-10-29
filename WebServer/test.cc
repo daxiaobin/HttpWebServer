@@ -113,10 +113,13 @@ int main(int argc, char *argv[])
 		threadNum = atoi(argv[1]);
 		Logger::setLogLevel(Logger::WARN);
 	}
-	Logger::setLogLevel(Logger::TRACE);
+	else{
+		Logger::setLogLevel(Logger::TRACE);
+	}
 
 	EventLoop loop;
 	InetAddress listenAddr(80);
+	//InetAddress listenAddr(112.74.34.226, 80);
 	HttpServer httpServer(&loop, listenAddr);
 	httpServer.setThreadNum(threadNum);
 	httpServer.start();

@@ -1,4 +1,11 @@
 language: c++
+dist: trusty
+compiler:
+    - g++
+os:
+    - linux
 script: 
-    - make
+    - ./WebServer/make
 sudo: required
+install:
+    - sudo apt-get install make
