@@ -11,6 +11,7 @@
 #include "base/timestamp.h"
 #include "eventloopthreadpool.h"
 #include "acceptor.h"
+#include "inetaddress.h"
 #include <memory>
 #include <functional>
 #include <map>
@@ -27,7 +28,7 @@ public:
 	typedef std::function<void(const TcpConnectionPtr &)> ConnectionCallback; 
 	typedef std::function<void(const TcpConnectionPtr &, Buffer *, Timestamp)> MessageCallback;
 			
-	Server(EventLoop *loop, unsigned short port);
+	Server(EventLoop *loop, const InetAddress &listenAddr);
 	~Server();
 
 	void start();
@@ -39,7 +40,7 @@ public:
 	void setMessageCallback(const MessageCallback &cb)
 	{ messageCallback_ = cb; }
 private:
-	void newConnection(int connfd);
+	void newConnection(int connfd, const InetAddress &clientAddr);
 	void removeConnection(const TcpConnectionPtr &conn);
 	void removeConnectionInLoop(const TcpConnectionPtr &conn);
 	typedef std::map<std::string, TcpConnectionPtr> ConnectionMap;

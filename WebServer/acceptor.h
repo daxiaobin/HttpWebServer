@@ -8,28 +8,28 @@
 
 #include "base/noncopyable.h"
 #include "channel.h"
+#include "inetaddress.h"
 #include <functional>
 
 class EventLoop;
 class Acceptor : Noncopyable
 {
 public:
-	typedef std::function<void(int)> NewConnectionCallback;
+	typedef std::function<void(int, const InetAddress&)> NewConnectionCallback;
 
-	Acceptor(EventLoop *loop, unsigned short port);
+	Acceptor(EventLoop *loop, const InetAddress &listenAddr);
 	~Acceptor();
 
 	void setConnectionCallback(const NewConnectionCallback &cb)
 	{ newConnectionCallback_ = cb; }
-	bool listenning() const { return listenning_; }
 
+	bool listenning() const { return listenning_; }
 	void listen();
 private:
 	void handleRead();
 private:
 	bool listenning_;
 	EventLoop *loop_;
-	unsigned short port_;
 	int listenFd_;
 	Channel channel_;
 	NewConnectionCallback newConnectionCallback_;

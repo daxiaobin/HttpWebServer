@@ -11,6 +11,7 @@
 #include "fileutil.h"
 #include <memory>
 
+//这个类是后台日志线程专门用来向日志文件写日志用的。
 class LogFile : Noncopyable{
 public:
 	LogFile(const std::string &basename, off_t rollSize, int flushInterval = 3, int checkEveryN = 1024);

@@ -21,6 +21,8 @@ EventLoopThread::~EventLoopThread()
 	thread_.join();
 }
 
+//这个函数是主线程调用的。
+//该函数返回EventLoop对象的指针，因此创建的所有线程中唯一的EventLoop对象都可被主线程访问。
 EventLoop* EventLoopThread::startLoop()
 {
 	thread_.start();
@@ -33,6 +35,7 @@ EventLoop* EventLoopThread::startLoop()
 	return loop_;
 }
 
+//这个函数是创建的I/O线程调用的
 void EventLoopThread::threadFunc()
 {
 	EventLoop loop;

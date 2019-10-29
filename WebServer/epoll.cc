@@ -4,6 +4,7 @@
  
 #include "epoll.h"
 #include "channel.h"
+#include "base/logging.h"
 #include <assert.h>
 
 static const int kNew = -1;
@@ -41,10 +42,10 @@ Timestamp Epoll::epoll(int timeoutMs, ChannelList *activeChannels)
 		}
 	}
 	else if(numEvents == 0){
-		printf("nothing happended\n");
+		LOG_TRACE << "nothing happended";
 	}
 	else{
-		printf("epoll_wait() error\n");
+		LOG_SYSERR << "epoll_wait() error";
 	}
 	return now;
 }
@@ -55,16 +56,14 @@ void Epoll::updateChannel(Channel *channel)
 	ownerLoop_->assertInLoopThread();
 	int state = channel->state();
 	if(state == kNew || state == kDeleted){ //如果该文件描述符是第一次注册或者之前被删除过，则这次是再次重新注册
-		if(state == kNew){
-			Channels_[channel->fd()] = channel;
-		}
+		Channels_[channel->fd()] = channel;
 		channel->set_state(kAdded);
 		update(EPOLL_CTL_ADD, channel);
 	}
 	else{ //如果该文件描述符已经注册过，则表明这个文件描述符现在是要修改或者是删除
 		if(channel->isNoneEvent()){
-			channel->set_state(kDeleted);
 			update(EPOLL_CTL_DEL, channel);
+			channel->set_state(kDeleted);
 		}
 		else{
 			update(EPOLL_CTL_MOD, channel);

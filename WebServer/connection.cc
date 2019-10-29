@@ -10,12 +10,14 @@
 
 using std::placeholders::_1;
 
-Connection::Connection(EventLoop *loop, const std::string &name, int connfd)
+Connection::Connection(EventLoop *loop, const std::string &name, int connfd, const InetAddress &localaddr, const InetAddress &peerAddr)
 : loop_(loop)
 , connfd_(connfd)
 , name_(name)
 , channel_(new Channel(loop_, connfd))
 , state_(kConnecting)
+, localaddr_(localaddr)
+, peerAddr_(peerAddr)
 {
 	channel_->setReadCallback(std::bind(&Connection::handleRead, this, _1));
 	channel_->setWriteCallback(std::bind(&Connection::handleWrite, this));
@@ -41,11 +43,11 @@ void Connection::connectionEstablished()
 void Connection::connectionDestroyed()
 {
 	loop_->assertInLoopThread();
-	//assert(state_ == kConnected);
+	assert(state_ == kConnected || state_ == kDisconnecting);
 	setState(kDisconnected);
 	channel_->disableAll();
 	connectionCallback_(shared_from_this());
-	loop_->removeChannel(channel_.get());
+	loop_->removeChannel(channel_.get()); //FIXME 这样写不好，不应该返回裸指针，但是也不会发生内存泄漏，因为其他地方没有delete。可以改为共享指针。
 }
 
 void Connection::send(const std::string &message)
@@ -64,6 +66,7 @@ void Connection::sendInLoop(const std::string &message)
 {
 	loop_->assertInLoopThread();
 	ssize_t nwrite = 0;
+	//if no thing in output queue, try writing directly.
 	if(!channel_->isWriting() && outputBuffer_.readableBytes() == 0){
 		nwrite = ::write(connfd_, message.data(), message.size());
 		if(nwrite >= 0){
@@ -90,7 +93,7 @@ void Connection::sendInLoop(const std::string &message)
 void Connection::shutdown()
 {
 	if(state_ == kConnected){
-		state_ = kConnecting;
+		state_ = kDisconnecting;
 		loop_->runInLoop(std::bind(&Connection::shutdownInLoop, shared_from_this()));
 	}
 }
@@ -148,7 +151,7 @@ void Connection::handleWrite()
 
 void Connection::handleClose()
 {
-	//assert(state_ == kConnected);
+	assert(state_ == kConnected || state_ == kDisconnecting);
 	channel_->disableAll();
 	closeCallback_(shared_from_this());
 }

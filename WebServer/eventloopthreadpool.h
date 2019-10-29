@@ -17,6 +17,8 @@
 class EventLoop;
 class EventLoopThread;
 
+//这个类是Server类的成员变量，Server类只在主线程中创建一个对象，
+//所以这个线程池类也只在主线程中创建一个对象，然后依次创建其他的I/O线程。
 class EventLoopThreadPool : Noncopyable
 {
 public:

@@ -2,6 +2,8 @@
  /// @author  daxiaobing(248918860@qq.com)
  /// @date    2019-09-18 18:45:21
  
+#include "base/logging.h"
+#include "util.h"
 #include <assert.h>
 #include <errno.h>
 #include <unistd.h>
@@ -22,10 +24,8 @@ do{\
 	}\
 }while(0)
 
-int socket_bind_listen(unsigned short port)
+int socket_bind_listen(const InetAddress &listenAddr)
 {
-	assert(port >= 0 && port <= 65535);
-
 	int listenFd = socket(AF_INET, SOCK_STREAM, 0);
 	ErrorCheck(listenFd, -1, "socket");
 
@@ -35,13 +35,7 @@ int socket_bind_listen(unsigned short port)
 	int ret = setsockopt(listenFd, SOL_SOCKET, SO_REUSEADDR, &opt, len);
 	ErrorCheck(ret, -1, "setsockopt");
 
-	struct sockaddr_in server_addr;
-	bzero(&server_addr, sizeof(server_addr));
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(port);
-	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-	ret = bind(listenFd, (struct sockaddr*)&server_addr, sizeof(server_addr));
+	ret = bind(listenFd, (struct sockaddr*)&listenAddr, sizeof(listenAddr));
 	ErrorCheck(ret, -1, "bind");
 
 	ret = listen(listenFd, 1000);
@@ -86,4 +80,26 @@ int getSockError(int fd)
 void shutdownWrite(int fd)
 {
 	::shutdown(fd, SHUT_WR);
+}
+
+struct sockaddr_in getLocalAddr(int sockfd)
+{
+	struct sockaddr_in localaddr;
+	bzero(&localaddr, sizeof(localaddr));
+	socklen_t addrlen = sizeof(localaddr);
+	if(::getsockname(sockfd, (struct sockaddr*)&localaddr, &addrlen) < 0){
+		LOG_SYSERR << "getLocalAddr error";
+	}
+	return localaddr;
+}
+
+struct sockaddr_in getPeerAddr(int sockfd)
+{
+	struct sockaddr_in peerAddr;
+	bzero(&peerAddr, sizeof(peerAddr));
+	socklen_t addrlen = sizeof(peerAddr);
+	if(::getpeername(sockfd, (struct sockaddr*)&peerAddr, &addrlen) < 0){
+		LOG_SYSERR << "getPeerAddr error";
+	}
+	return peerAddr;
 }

@@ -9,11 +9,11 @@
 
 //用于将日志输出到文件中
 static pthread_once_t once_control = PTHREAD_ONCE_INIT;
-static AsyncLogging* asyncLogging_ = nullptr;
+static std::unique_ptr<AsyncLogging> asyncLoggingPtr_;
 void once_init()
 {
-	asyncLogging_ = new AsyncLogging("LOG_FILE", 10 * 1024 * 1024);
-	asyncLogging_->start();
+	asyncLoggingPtr_.reset(new AsyncLogging("LOG_FILE", 10 * 1024 * 1024));
+	asyncLoggingPtr_->start();
 }
 
 
@@ -79,6 +79,7 @@ void Logger::setFlush(Logger::FlushFunc func)
 	g_flush = func;
 }
 
+//日志的格式：日期 时间 线程id 级别 正文 - 源文件名:行号
 Logger::Impl::Impl(LogLevel level, const char *filename, int line)
 : stream_()
 , level_(level)
@@ -87,7 +88,7 @@ Logger::Impl::Impl(LogLevel level, const char *filename, int line)
 {
 	formatTime();
 	stream_ << CurrentThread::tid();
-	stream_ << ' ' << LogLevelName[level_] << ' ';
+	stream_ << ' ' << LogLevelName[level_] << " -- ";
 }
 
 void Logger::Impl::formatTime()
@@ -98,13 +99,13 @@ void Logger::Impl::formatTime()
 	gettimeofday(&tv, NULL);
 	time = tv.tv_sec;
 	struct tm *p_time = localtime(&time);
-	strftime(str_t, 26, "%y-%m-%d %H:%M:%S  ", p_time);
+	strftime(str_t, 26, "%y-%m-%d %H:%M:%S ", p_time);
 	stream_ << str_t;
 }
 
 void Logger::Impl::finish()
 {
-	stream_ << " - " << basename_ << ":" << line_ << '\n';
+	stream_ << " -- " << basename_ << ":" << line_ << '\n';
 }
 
 

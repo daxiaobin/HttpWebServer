@@ -8,11 +8,10 @@
 #include <arpa/inet.h>
 #include <string.h>
 
-Acceptor::Acceptor(EventLoop *loop, unsigned short port)
+Acceptor::Acceptor(EventLoop *loop, const InetAddress &listenAddr)
 : listenning_(false)
 , loop_(loop)
-, port_(port)
-, listenFd_(socket_bind_listen(port))
+, listenFd_(socket_bind_listen(listenAddr))
 , channel_(loop_, listenFd_)
 {
 	channel_.setReadCallback(std::bind(&Acceptor::handleRead, this));
@@ -34,8 +33,7 @@ void Acceptor::handleRead()
 {
 	loop_->assertInLoopThread();
 
-	//FIXME 这些写在这里是没有意义的
-	struct sockaddr_in client_addr;
+	sockaddr_in client_addr;
 	bzero(&client_addr, sizeof(client_addr));
 	socklen_t len = sizeof(client_addr);
 
@@ -43,7 +41,8 @@ void Acceptor::handleRead()
 	if(connfd >= 0){
 		if(newConnectionCallback_){
 			setSocketNonBlocking(connfd);
-			newConnectionCallback_(connfd);
+			InetAddress peerAddr(client_addr);
+			newConnectionCallback_(connfd, peerAddr);
 		}
 		else{
 			::close(connfd);

@@ -13,8 +13,8 @@ using namespace std::placeholders;
 
 class HttpServer : Noncopyable{
 public:
-	HttpServer(EventLoop *loop, unsigned short port)
-	: server_(loop, port)
+	HttpServer(EventLoop *loop, const InetAddress &listenAddr)
+	: server_(loop, listenAddr)
 	{
 		server_.setConnectionCallback(std::bind(&HttpServer::onConnection, this, _1));
 		server_.setMessageCallback(std::bind(&HttpServer::onMessage, this, _1, _2, _3));

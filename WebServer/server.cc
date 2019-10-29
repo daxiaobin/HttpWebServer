@@ -6,18 +6,19 @@
 #include "util.h"
 #include "eventloop.h"
 #include "connection.h"
+#include "base/logging.h"
 #include <assert.h>
-using std::placeholders::_1;
+using namespace std::placeholders;
 
-Server::Server(EventLoop *loop, unsigned short port)
+Server::Server(EventLoop *loop, const InetAddress &listenAddr)
 : loop_(loop)
-, name_(std::string())
-, acceptor_(new Acceptor(loop, port))
+, name_(listenAddr.toHostPort())
+, acceptor_(new Acceptor(loop, listenAddr))
 , threadpool_(new EventLoopThreadPool(loop))
 , started_(false)
 , nextConnId_(1)
 {
-	acceptor_->setConnectionCallback(std::bind(&Server::newConnection, this, _1));
+	acceptor_->setConnectionCallback(std::bind(&Server::newConnection, this, _1, _2));
 }
 
 Server::~Server()
@@ -39,7 +40,7 @@ void Server::setThreadNum(int threadNums)
 	threadpool_->setThreadNum(threadNums);
 }
 
-void Server::newConnection(int connfd)
+void Server::newConnection(int connfd, const InetAddress &clientAddr)
 {
 	loop_->assertInLoopThread();
 	char buf[32] = {0};
@@ -47,14 +48,17 @@ void Server::newConnection(int connfd)
 	++nextConnId_;
 	std::string connName = name_ + buf;
 
-//	TcpConnectionPtr conn = std::make_shared<Connection>(loop_, connName, connfd);
+	LOG_INFO << "newConnection [" << connName << "] " << "from [" << clientAddr.toHostPort() << "]";
+	InetAddress localAddr(getLocalAddr(connfd));
+
 	EventLoop *ioLoop = threadpool_->getNextLoop();
-	TcpConnectionPtr conn(new Connection(ioLoop, connName, connfd));
+	TcpConnectionPtr conn(new Connection(ioLoop, connName, connfd, localAddr, clientAddr)); //注意Connection对象的生命周期，
+	//该函数结束后Connection对象引用计数减1。由于将该conn对象放入了map中，因此引用计数加1。当断开连接将Connection对象从map中erase掉后，
+	//该Connection对象的生命周期就岌岌可危了。注意理解...
 	connections_[connName] = conn;
 	conn->setConnectionCallback(connectionCallback_);
 	conn->setMessageCallback(messageCallback_);
-	conn->setCloseCallback(std::bind(&Server::removeConnection, this, _1));
-//	conn->connectionEstablished();
+	conn->setCloseCallback(std::bind(&Server::removeConnection, this, _1)); 
 	ioLoop->runInLoop(std::bind(&Connection::connectionEstablished, conn)); //将此函数放到io线程中调用
 }
 

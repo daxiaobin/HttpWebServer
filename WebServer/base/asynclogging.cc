@@ -47,7 +47,7 @@ void AsyncLogging::stop()
 
 void AsyncLogging::append(const char *logline, size_t len)
 {
-	MutexLockGuard autoLock(mutex_);
+	MutexLockGuard autoLock(mutex_); //这里如果业务线程太多会造成锁争用，会有点影响性能。
 	if(currentBuffer_->avail() > len){ //最常发生的情况
 		currentBuffer_->append(logline, len);
 	}
@@ -64,10 +64,11 @@ void AsyncLogging::append(const char *logline, size_t len)
 	}
 }
 
-void AsyncLogging::threadFunc() //当创建一个后端线程的时候就运行这个函数
+//当创建一个后端线程的时候就运行这个函数
+void AsyncLogging::threadFunc() 
 {
 	latch_.countDown();
-	LogFile output(basename_, rollSize_);
+	LogFile output(basename_, rollSize_); //在这里创建LogFile对象。
 	BufferPtr newBuffer1(new Buffer);
 	BufferPtr newBuffer2(new Buffer);
 	newBuffer1->bzero();
@@ -77,7 +78,7 @@ void AsyncLogging::threadFunc() //当创建一个后端线程的时候就运行�
 	while(running_){
 		{ //这一语句块是核心内容
 			MutexLockGuard autoLock(mutex_);
-			if(buffers_.empty()){
+			if(buffers_.empty()){ //这里不能用while，因为是waitForSeconds，被唤醒后buffers_仍然可能是empty
 				cond_.waitForSeconds(flushInterval_);
 			}
 			buffers_.push_back(std::move(currentBuffer_));
