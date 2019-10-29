@@ -4,8 +4,8 @@ compiler:
     - g++
 os:
     - linux
-script: 
-    - ./WebServer/make
 sudo: required
 install:
     - sudo apt-get install make
+script: 
+    - ./WebServer/./test
