@@ -59,7 +59,7 @@ void HttpServer::setResponseContext(const HttpRequest &req, HttpResponse &resp) 
 	}*/
 	std::map<string, string>::const_iterator connection = headers.find("Connection");
 	if(connection != headers.end()){
-		LOG_INFO << connection->second;
+		//LOG_INFO << connection->second;
 	}
 	if(req.getPath() == "/"){
 		resp.setStatusCode(k200OK);
@@ -67,9 +67,13 @@ void HttpServer::setResponseContext(const HttpRequest &req, HttpResponse &resp) 
 		resp.setContentType("text/html");
 		resp.addHeaderField("Server", "HttpServer");
 		string now = Timestamp::now().toFormattedString();
-		resp.setBody("<html><head><title>This is title</title></head>"
-				"<body><h1>Hello</h1>Now is " + now +
-				"</body></html>");
+		resp.setBody("<html><head><title>This is title</title></head>""<body><h1>Hello</h1>Now is " + now + "</body></html>"
+					  + "<html><head><title>This is title</title></head>""<body><h1>Hello</h1>Now is " + now + "</body></html>"
+					  + "<html><head><title>This is title</title></head>""<body><h1>Hello</h1>Now is " + now + "</body></html>"
+					  + "<html><head><title>This is title</title></head>""<body><h1>Hello</h1>Now is " + now + "</body></html>"
+					  + "<html><head><title>This is title</title></head>""<body><h1>Hello</h1>Now is " + now + "</body></html>"
+					  + "<html><head><title>This is title</title></head>""<body><h1>Hello</h1>Now is " + now + "</body></html>"
+				);
 	}
 	else if(req.getPath() == "/favicon.ico"){
 		resp.setStatusCode(k200OK);

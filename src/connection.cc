@@ -6,6 +6,7 @@
 #include "eventloop.h"
 #include "channel.h"
 #include "util.h"
+#include "base/logging.h"
 #include <assert.h>
 
 using std::placeholders::_1;
@@ -120,6 +121,7 @@ void Connection::handleRead(Timestamp receiveTime)
 {
 	int saveErrno;
 	ssize_t n = inputBuffer_.readFd(connfd_, &saveErrno);
+	LOG_INFO << "helloworld helloworld";
 	if(n > 0){
 		messageCallback_(shared_from_this(), &inputBuffer_, receiveTime);
 	}
