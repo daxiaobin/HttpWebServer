@@ -4,7 +4,7 @@ notifications:
 sudo: required
 dist: trusty
 compiler:
-  - g++
+  - gcc 6.5.0
 os:
   - linux
 script:
