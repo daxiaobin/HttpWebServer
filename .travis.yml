@@ -4,16 +4,23 @@ notifications:
 sudo: required
 dist: trusty
 compiler:
-  - gcc 6.5.0
-os:
-  - linux
-install:
-  - sudo apt-get update && \
-  - sudo apt-get install gcc-snapshot -y && \
-  - sudo apt-get update && \
-  - sudo apt-get install gcc-6 g++-6 -y && \
-  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6 && \
-  - sudo update-alternatives --config gcc
+  - gcc
+
+matrix:
+  include:
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+
+before_install:
+    - eval "${MATRIX_EVAL}"
 
 script:
   - gcc -v
