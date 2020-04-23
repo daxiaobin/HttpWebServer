@@ -42,7 +42,7 @@ Timestamp Epoll::epoll(int timeoutMs, ChannelList *activeChannels)
 		}
 	}
 	else if(numEvents == 0){
-		//LOG_TRACE << "nothing happended";
+		LOG_TRACE << "nothing happended";
 	}
 	else{
 		LOG_SYSERR << "epoll_wait() error";

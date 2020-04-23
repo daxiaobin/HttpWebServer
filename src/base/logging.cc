@@ -40,9 +40,9 @@ Logger::LogLevel initLogLevel()
 void defalutOutput(const char *msg, int len)
 {
 	//将日志输出到标准输出中
-	//size_t n = fwrite(msg, 1, len, stdout);
-	//if(n != static_cast<size_t>(len)){
-	//}
+	size_t n = fwrite(msg, 1, len, stdout);
+	if(n != static_cast<size_t>(len)){
+	}
 	//将日志输出到文件中
 	//pthread_once(&once_control, once_init);
 	//asyncLoggingPtr_->append(msg, len);
