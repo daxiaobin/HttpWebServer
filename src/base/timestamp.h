@@ -6,7 +6,7 @@
 #define TIMESTAMP_H__
 
 #include <string>
-//#include <stdint.h>
+#include <stdint.h>
 using std::string;
 
 
