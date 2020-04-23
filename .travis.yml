@@ -8,6 +8,7 @@ compiler:
 os:
   - linux
 script:
+  - make -v
   - cd src
   - make
   - sudo ./test
