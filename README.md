@@ -1,5 +1,7 @@
 # 并发网络库
 [![Build Status](https://travis-ci.com/daxiaobin/HttpWebServer.svg?branch=master)](https://travis-ci.com/daxiaobin/HttpWebServer)
+![](https://img.shields.io/badge/language-c++11-blue.svg)
+![](https://img.shields.io/badge/license-MIT-red.svg)
 
 ## 简介
 
